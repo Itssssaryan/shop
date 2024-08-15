@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-class LoginRequest extends FormRequest
+class AdminLoginRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Determine if the admin is authorized to make this request.
      */
     public function authorize(): bool
     {
@@ -41,15 +41,28 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        // if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        //     RateLimiter::hit($this->throttleKey());
 
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
-        }
+        //     throw ValidationException::withMessages([
+        //         'email' => trans('auth.failed'),
+        //     ]);
+        // }
 
-        RateLimiter::clear($this->throttleKey());
+        // RateLimiter::clear($this->throttleKey());
+
+            $admin = Admin::where('email', $this->username)->onWhere('phone',$this->username)->first();
+            if(!empty($admin) && Hash::check( $this->password, $admin->password)){
+                Auth::guard()->login($admin, $this->boolean('remember'));
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'username' => trans('auth.failed')
+                ]);
+            }
+
+            RateLimiter::clear($this->throttleKey());
+
+
     }
 
     /**
