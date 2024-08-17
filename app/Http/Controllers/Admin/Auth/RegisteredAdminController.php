@@ -43,8 +43,8 @@ class RegisteredAdminController extends Controller
 
         event(new Registered($admin));
 
-        Auth::gurad('admin')->login($admin);
+        Auth::guard('admin')->login($admin);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('admin.dashboard', absolute: false));
     }
 }

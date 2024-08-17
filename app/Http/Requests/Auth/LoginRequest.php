@@ -41,27 +41,15 @@ class AdminLoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        // if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-        //     RateLimiter::hit($this->throttleKey());
+        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey());
 
-        //     throw ValidationException::withMessages([
-        //         'email' => trans('auth.failed'),
-        //     ]);
-        // }
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
+        }
 
-        // RateLimiter::clear($this->throttleKey());
-
-            $admin = Admin::where('email', $this->username)->onWhere('phone', $this->username)->first();
-            if(!empty($admin) && Hash::check( $this->password, $admin->password)){
-                Auth::guard()->login($admin, $this->boolean('remember'));
-                RateLimiter::hit($this->throttleKey());
-                throw ValidationException::withMessages([
-                    'username' => trans('auth.failed')
-                ]);
-            }
-
-            RateLimiter::clear($this->throttleKey());
-
+        RateLimiter::clear($this->throttleKey());
 
     }
 
@@ -93,6 +81,6 @@ class AdminLoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
     }
 }

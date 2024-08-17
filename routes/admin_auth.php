@@ -1,15 +1,15 @@
 <?php
 
 use App\Http\Controllers\Admin\ProfileController;
-use App\Http\Controllers\Auth\Admin\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\Admin\RegisteredUserController;
+use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\Auth\RegisteredAdminController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest:admin')->name('admin.')->prefix('admin')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
+    Route::get('register', [RegisteredAdminController::class, 'create'])
         ->name('register');
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    Route::post('register', [RegisteredAdminController::class, 'store']);
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
@@ -23,7 +23,6 @@ Route::middleware('auth:admin')->name('admin.')->prefix('admin')->group(function
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
-
 
 Route::get('/dashboard', function () {
     return view('dashboard');
