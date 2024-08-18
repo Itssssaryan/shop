@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\Admin;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -53,8 +54,11 @@ class AdminLoginRequest extends FormRequest
 
             $admin = Admin::where('email', $this->username)->onWhere('phone', $this->username)->first();
             if(!empty($admin) && Hash::check( $this->password, $admin->password)){
+
                 Auth::guard()->login($admin, $this->boolean('remember'));
+
                 RateLimiter::hit($this->throttleKey());
+                
                 throw ValidationException::withMessages([
                     'username' => trans('auth.failed')
                 ]);
